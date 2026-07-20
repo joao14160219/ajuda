@@ -229,6 +229,7 @@
   .card.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 10px 26px rgba(0,0,0,0.4); }
 
   .text-card{
+    position:relative;
     border:1px solid var(--line);
     background:rgba(243,236,221,0.03);
     border-radius:3px;
@@ -248,6 +249,26 @@
     color:var(--blush);
     transition:top .28s ease, left .28s ease, transform .25s ease;
   }
+
+  .rank-badge{
+    position:absolute;
+    top:8px; right:8px;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:var(--gold-soft);
+    color:#241226;
+    font-family:'Cinzel', serif;
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    transform:scale(0.6);
+    transition:opacity .2s ease, transform .2s ease;
+    pointer-events:none;
+  }
+  .text-card.selected .rank-badge{ opacity:1; transform:scale(1); }
+  .text-card.selected{ opacity:0.88; }
 
   .swatches{
     display:grid;
@@ -336,11 +357,11 @@
 </style>
 
 <style>
-.puzzle{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:420px;width:100%;aspect-ratio:1/1;margin:0 auto 18px}
+.puzzle{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;max-width:420px;width:100%;aspect-ratio:1/1;margin:0 auto 18px}
 .piece{
   width:100%;
   aspect-ratio:1/1;
-  background-size:300% 300%;
+  background-size:200% 200%;
   background-repeat:no-repeat;
   opacity:0;
   cursor:pointer;
@@ -371,17 +392,32 @@
     <div class="eyebrow">Uma leitura reservada</div>
     <h1>Sabe qual é a vantagem de conhecer alguém programador?</h1>
     <p class="lead">É que eu consigo prever o futuro.</p>
-    <button class="btn" onclick="goTo('flor')">Ler meu destino</button>
+    <button class="btn" onclick="goTo('comida')">Ler meu destino</button>
+  </section>
+
+  <!-- TELA 0.5: COMIDA (ranking) -->
+  <section id="screen-comida" class="screen">
+    <div class="progress">
+      <span class="node active"></span><span class="rule"></span>
+      <span class="node"></span><span class="rule"></span>
+      <span class="node"></span><span class="rule"></span>
+      <span class="node"></span>
+    </div>
+    <div class="eyebrow">Antes de tudo</div>
+    <h1>Em ordem, quais comidas você mais gosta?</h1>
+    <p class="lead">Clique nas opções na ordem da sua preferência — da que você mais gosta até a que gosta menos.</p>
+    <div class="cards" id="cards-comida"></div>
   </section>
 
   <!-- TELA 1: FLOR -->
   <section id="screen-flor" class="screen">
     <div class="progress">
       <span class="node active"></span><span class="rule"></span>
+      <span class="node active"></span><span class="rule"></span>
       <span class="node"></span><span class="rule"></span>
       <span class="node"></span>
     </div>
-    <div class="eyebrow">Primeira carta</div>
+    <div class="eyebrow">Segunda carta</div>
     <h1>Qual é a sua flor preferida?</h1>
     <div class="cards" id="cards-flor"></div>
   </section>
@@ -391,9 +427,10 @@
     <div class="progress">
       <span class="node active"></span><span class="rule"></span>
       <span class="node active"></span><span class="rule"></span>
+      <span class="node active"></span><span class="rule"></span>
       <span class="node"></span>
     </div>
-    <div class="eyebrow">Segunda carta</div>
+    <div class="eyebrow">Terceira carta</div>
     <h1>Qual cor você mais gosta dessas?</h1>
     <div class="swatches" id="cards-cor"></div>
   </section>
@@ -401,6 +438,7 @@
   <!-- TELA 3: PRIMEIRO BEIJO -->
   <section id="screen-beijo" class="screen">
     <div class="progress">
+      <span class="node active"></span><span class="rule"></span>
       <span class="node active"></span><span class="rule"></span>
       <span class="node active"></span><span class="rule"></span>
       <span class="node active"></span>
@@ -484,6 +522,15 @@ const supabaseClient = (SUPABASE_URL.includes("SEU-PROJETO"))
 /* =========================================================
    DADOS — troque os caminhos das imagens pelas suas
    ========================================================= */
+const COMIDAS = [
+  { id: "italiana",   label: "Italiana" },
+  { id: "francesa",   label: "Francesa" },
+  { id: "japonesa",   label: "Japonesa" },
+  { id: "arabe",      label: "Árabe" },
+  { id: "brasileira", label: "Brasileira" },
+  { id: "mexicana",   label: "Mexicana" },
+];
+
 const BEIJOS = [
   { id: "festa",  label: "Festa" },
   { id: "date",   label: "Date" },
@@ -544,7 +591,7 @@ const FLORES = [
   },
 ];
 
-const state = { beijo: null, flor: null, cor: null };
+const state = { beijo: null, flor: null, cor: null, comida: [] };
 
 /* =========================================================
    NAVEGAÇÃO
@@ -552,6 +599,30 @@ const state = { beijo: null, flor: null, cor: null };
 function goTo(name){
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("screen-" + name).classList.add("active");
+}
+
+/* Ranking de comidas: clique na ordem de preferência.
+   Cada clique grava a posição e mostra o número na própria carta. */
+function renderComida(){
+  const el = document.getElementById("cards-comida");
+  el.innerHTML = COMIDAS.map(c => `
+    <button class="text-card" data-id="${c.id}" role="button" tabindex="0">
+      <span class="rank-badge"></span>
+      ${c.label}
+    </button>
+  `).join("");
+
+  el.querySelectorAll(".text-card").forEach(card => {
+    card.addEventListener("click", () => {
+      if (card.classList.contains("selected")) return;
+      state.comida.push(card.dataset.id);
+      card.classList.add("selected");
+      card.querySelector(".rank-badge").textContent = state.comida.length;
+      if (state.comida.length === COMIDAS.length){
+        setTimeout(() => goTo("flor"), 450);
+      }
+    });
+  });
 }
 
 function renderCards(containerId, items, field, onSelect){
@@ -648,7 +719,8 @@ function attachDodge(el){
   el.addEventListener("focus", flee);
 }
 
-/* fluxo: flor -> cor (dinâmica pra flor escolhida) -> beijo */
+/* fluxo: comida -> flor -> cor (dinâmica pra flor escolhida) -> beijo */
+renderComida();
 renderCards("cards-flor", FLORES, "flor", () => {
   renderSwatchesForFlor();
   goTo("cor");
@@ -732,6 +804,7 @@ function isSolved(order){
   return order.every((piece,slot) => piece === slot);
 }
 
+/* Quebra-cabeça de 4 peças (grade 2x2) */
 function montarRevelacao(){
   const flor=FLORES.find(f=>f.id===state.flor);
   let corInfo=(flor.cores?flor.cores.find(c=>c.id===state.cor):CORES_GENERICAS.find(c=>c.id===state.cor));
@@ -741,7 +814,7 @@ function montarRevelacao(){
   puzzle.innerHTML="";
 
   /* order[slot] = índice da peça correta que está atualmente nesse slot */
-  let order=[0,1,2,3,4,5,6,7,8];
+  let order=[0,1,2,3];
   do { shuffle(order); } while (isSolved(order));
   let selected=null;
 
@@ -749,13 +822,13 @@ function montarRevelacao(){
   function render(){
     tiles.forEach((el,slot) => {
       const piece=order[slot];
-      const col=piece%3, row=Math.floor(piece/3);
-      el.style.backgroundPosition=`${col*50}% ${row*50}%`;
+      const col=piece%2, row=Math.floor(piece/2);
+      el.style.backgroundPosition=`${col*100}% ${row*100}%`;
       el.classList.toggle("selected", slot===selected);
     });
   }
 
-  for(let slot=0;slot<9;slot++){
+  for(let slot=0;slot<4;slot++){
     const d=document.createElement("div");
     d.className="piece";
     d.style.backgroundImage=`url(${img})`;
@@ -836,6 +909,7 @@ async function salvarResposta(resposta){
         primeiro_beijo: resposta.beijo,
         flor: resposta.flor,
         cor: resposta.cor,
+        comidas_ranking: (resposta.comida || []).join(","),
         criado_em: new Date().toISOString()
       }]);
     if (error) console.error("Erro ao salvar no Supabase:", error);
