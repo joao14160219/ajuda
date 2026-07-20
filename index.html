@@ -516,13 +516,15 @@
 /* =========================================================
    CONFIGURAÇÃO — troque pelos seus dados do Supabase
    ========================================================= */
-const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
-const SUPABASE_ANON_KEY = "SUA_CHAVE_ANON_AQUI";
+const SUPABASE_URL = "https://zjlwvjlvvwwbivohabrr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbHd2amx2dnd3Yml2b2hhYnJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NTA1ODcsImV4cCI6MjA5MTEyNjU4N30.6jJlJ3HPfgPWW6h8a-7H1KfjnRY0M0QViWw3cdLAV8A";
 const TABLE_NAME = "respostas";
 
 const supabaseClient = (SUPABASE_URL.includes("SEU-PROJETO"))
   ? null
   : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+
 
 /* =========================================================
    DADOS — troque os caminhos das imagens pelas suas
@@ -880,7 +882,7 @@ function montarRevelacao(){
 
   document.getElementById("restaurant-img").src = restauranteImg;
   document.getElementById("cap-restaurant").textContent =
-  `E pra fechar a noite, um jantar ${comidaTop.label.toLowerCase()} — no nosso restaurante favorito.`;
+  `E pra fechar a noite, um jantar ${comidaTop.label.toLowerCase()}.`;
 }
 
 
