@@ -477,6 +477,11 @@
 <div class="cap" id="cap-date"></div>
 </div>
 
+    <div class="reveal-card" id="restaurant-card">
+<img id="restaurant-img" alt="Restaurante">
+<div class="cap" id="cap-restaurant"></div>
+</div>
+
     <button class="btn" id="btn-confirm">Vamos tornar isso real?</button>
     <footer class="note">feito à mão, sem nenhuma IA prevendo nada — só eu, torcendo</footer>
   </section>
@@ -530,6 +535,16 @@ const COMIDAS = [
   { id: "brasileira", label: "Brasileira" },
   { id: "mexicana",   label: "Mexicana" },
 ];
+
+/* imagem de restaurante correspondente à comida favorita (1º lugar do ranking) */
+const RESTAURANTES = {
+  italiana:   "Restaurante-Italiano.jpg",
+  francesa:   "restaurante-frances.jpg",
+  japonesa:   "restaurante-japones.jpg",
+  arabe:      "restaurante-arabe.jpg",
+  brasileira: "restaurante-brasil.jfif",
+  mexicana:   "restaurante-mexicano.jpg",
+};
 
 const BEIJOS = [
   { id: "festa",  label: "Festa" },
@@ -857,6 +872,15 @@ function montarRevelacao(){
 
   document.getElementById("cap-date").textContent=
   `Chegando pro nosso date, com ${flor.label.toLowerCase()} ${corInfo.label.toLowerCase()} debaixo do braço.`;
+
+  /* comida favorita = primeira escolhida no ranking */
+  const comidaTopId = state.comida[0];
+  const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
+  const restauranteImg = RESTAURANTES[comidaTopId];
+
+  document.getElementById("restaurant-img").src = restauranteImg;
+  document.getElementById("cap-restaurant").textContent =
+  `E pra fechar a noite, um jantar ${comidaTop.label.toLowerCase()} — no nosso restaurante favorito.`;
 }
 
 
