@@ -700,6 +700,8 @@
 
 <!-- Supabase client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- EmailJS client -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 /* =========================================================
    CONFIGURAÇÃO — troque pelos seus dados do Supabase
@@ -711,6 +713,20 @@ const TABLE_NAME = "respostas";
 const supabaseClient = (SUPABASE_URL.includes("SEU-PROJETO"))
   ? null
   : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =========================================================
+   CONFIGURAÇÃO — EmailJS
+   Troque pelos IDs da sua conta em emailjs.com
+   (Account > API Keys / Email Services / Email Templates)
+   ========================================================= */
+const EMAILJS_PUBLIC_KEY  = "d_vqCswosM6WznK-Y";
+const EMAILJS_SERVICE_ID  = "service_lfccq7g";
+const EMAILJS_TEMPLATE_ID = "template_ue3v5lz";
+
+const emailjsAtivo = !EMAILJS_PUBLIC_KEY.includes("SUA_PUBLIC_KEY");
+if (emailjsAtivo && window.emailjs) {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
 
 
 
@@ -1370,8 +1386,26 @@ document.getElementById("btn-email-confirmar").addEventListener("click", async (
     `Dia ${dataFormatada}, jantar ${jantarState.restauranteLabel ? jantarState.restauranteLabel.toLowerCase() : ""}. Guarda esse dia — eu vou guardar também.`;
 
   await salvarConfirmacaoJantar();
+  await enviarEmailConfirmacao(dataFormatada);
   pinkGoTo("pink-final");
 });
+
+/* ---------- enviar e-mail de confirmação (EmailJS) ---------- */
+async function enviarEmailConfirmacao(dataFormatada){
+  if (!emailjsAtivo || !window.emailjs) {
+    console.warn("EmailJS não configurado ainda — e-mail de confirmação não foi enviado.");
+    return;
+  }
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: jantarState.email,
+      data_jantar: dataFormatada,
+      restaurante: jantarState.restauranteLabel || "",
+    });
+  } catch (e) {
+    console.error("Falha ao enviar e-mail de confirmação:", e);
+  }
+}
 
 /* ---------- salvar no Supabase ---------- */
 async function salvarConfirmacaoJantar(){
