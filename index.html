@@ -378,6 +378,117 @@
 @keyframes pieceIn{to{opacity:1;transform:scale(1) rotate(0)}}
 </style>
 
+<style>
+/* ========== senha + tela rosa (convite pro jantar) ========== */
+.field-input{
+  width:100%;
+  font-family:'EB Garamond', serif;
+  font-size:16px;
+  padding:12px 14px;
+  border-radius:3px;
+  border:1px solid var(--line);
+  background:rgba(243,236,221,0.06);
+  color:var(--cream);
+  text-align:center;
+  outline:none;
+}
+.field-input:focus{ border-color:var(--gold); }
+.field-input::placeholder{ color:rgba(243,236,221,0.4); }
+
+.senha-erro{
+  display:none;
+  margin:12px 0 0;
+  font-size:13px;
+  font-style:italic;
+  color:var(--blush);
+}
+.senha-erro.show{ display:block; }
+
+.pink-overlay{
+  display:none;
+  position:fixed; inset:0; z-index:90;
+  background:
+    radial-gradient(ellipse at 25% 20%, rgba(217,139,147,0.5), transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(122,52,72,0.6), transparent 55%),
+    linear-gradient(180deg, #3D1B2A 0%, #2C1521 60%, #200F19 100%);
+  align-items:center;
+  justify-content:center;
+  padding:28px 20px;
+  overflow-y:auto;
+}
+.pink-overlay.active{ display:flex; }
+.pink-stage{
+  width:100%;
+  max-width:460px;
+  text-align:center;
+}
+.pink-step{ display:none; }
+.pink-step.active{ display:block; animation:pieceIn .4s ease; }
+.pink-step h1{ color:var(--cream); }
+.pink-step p.lead{ margin-left:auto; margin-right:auto; }
+
+.pink-actions{
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+
+.calendar{
+  background:rgba(243,236,221,0.04);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:18px;
+  margin-bottom:22px;
+  text-align:left;
+}
+.calendar-head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px;
+  font-family:'Cinzel', serif;
+  letter-spacing:0.05em;
+  font-size:13px;
+  text-transform:uppercase;
+  color:var(--gold-soft);
+}
+.calendar-head button{
+  background:none; border:none; color:var(--gold-soft);
+  font-size:18px; cursor:pointer; padding:4px 10px;
+}
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+  text-align:center;
+}
+.calendar-grid .dow{
+  font-size:11px;
+  color:rgba(243,236,221,0.5);
+  font-family:'Cinzel', serif;
+  text-transform:uppercase;
+  padding-bottom:4px;
+}
+.calendar-grid .day{
+  aspect-ratio:1/1;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  font-size:14px;
+  cursor:pointer;
+  color:var(--cream);
+  transition:background .2s ease, color .2s ease;
+}
+.calendar-grid .day:hover{ background:rgba(228,201,138,0.2); }
+.calendar-grid .day.disabled{
+  color:rgba(243,236,221,0.18);
+  cursor:default;
+  pointer-events:none;
+}
+.calendar-grid .day.selected{
+  background:var(--gold-soft); color:#241226; font-weight:600;
+}
+</style>
+
 </head>
 <body>
 
@@ -483,6 +594,9 @@
 </div>
 
     <button class="btn" id="btn-confirm">Vamos tornar isso real?</button>
+
+    <button class="btn ghost" id="btn-open-senha" style="margin-top:14px;">tenho uma senha</button>
+
     <footer class="note">feito à mão, sem nenhuma IA prevendo nada — só eu, torcendo</footer>
   </section>
 
@@ -507,6 +621,80 @@
       <p class="modal-insta">meu insta: @joaopedroo.fm</p>
       <p class="modal-text small">me ajuda com esse problema</p>
     </div>
+  </div>
+</div>
+
+<!-- POP UP: senha -->
+<div class="modal-overlay" id="modal-senha">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-senha-close" aria-label="Fechar">&times;</button>
+    <div class="modal-content">
+      <p class="modal-text">essa parte é só pra quem sabe a senha certa.</p>
+      <input type="password" id="input-senha" class="field-input" placeholder="digite a senha" autocomplete="off">
+      <button class="btn" id="btn-senha-confirmar" style="margin-top:16px;">Entrar</button>
+      <p class="senha-erro" id="senha-erro">senha errada, tenta de novo</p>
+    </div>
+  </div>
+</div>
+
+<!-- TELA ROSA: convite pro jantar -->
+<div class="pink-overlay" id="tela-jantar">
+  <div class="pink-stage">
+
+    <!-- passo 1: pergunta -->
+    <div class="pink-step active" id="pink-pergunta">
+      <div class="eyebrow">agora sim</div>
+      <h1>Aceita jantar comigo?</h1>
+      <div class="pink-actions">
+        <button class="btn" id="btn-jantar-sim">Sim</button>
+        <button class="text-card" id="btn-jantar-nao">Não</button>
+      </div>
+    </div>
+
+    <!-- passo 2: restaurante confirmado -->
+    <div class="pink-step" id="pink-restaurante">
+      <div class="eyebrow">reservado</div>
+      <h1>Combinado, então</h1>
+      <div class="reveal-card">
+        <img id="jantar-restaurant-img" alt="Restaurante">
+        <div class="cap" id="jantar-restaurant-cap"></div>
+      </div>
+      <button class="btn" id="btn-ir-calendario">Escolher a data</button>
+    </div>
+
+    <!-- passo 3: calendário -->
+    <div class="pink-step" id="pink-calendario">
+      <div class="eyebrow">quando?</div>
+      <h1>Escolha o dia</h1>
+      <p class="lead">Toque numa data disponível pra gente marcar.</p>
+      <div class="calendar">
+        <div class="calendar-head">
+          <button id="cal-prev" aria-label="Mês anterior">&#8249;</button>
+          <span id="cal-month-label"></span>
+          <button id="cal-next" aria-label="Próximo mês">&#8250;</button>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <!-- passo 4: email -->
+    <div class="pink-step" id="pink-email">
+      <div class="eyebrow">último passo</div>
+      <h1>Qual o seu e-mail?</h1>
+      <p class="lead">É pra eu te mandar a confirmação do nosso date.</p>
+      <input type="email" id="input-email" class="field-input" placeholder="seuemail@exemplo.com" autocomplete="off">
+      <p class="senha-erro" id="email-erro">digite um e-mail válido</p>
+      <button class="btn" id="btn-email-confirmar" style="margin-top:16px;">Confirmar</button>
+    </div>
+
+    <!-- passo 5: final -->
+    <div class="pink-step" id="pink-final">
+      <div class="eyebrow">está marcado</div>
+      <h1 id="pink-final-titulo">Então é isso.</h1>
+      <p class="lead" id="pink-final-texto"></p>
+      <footer class="note">obrigado por ler o nosso destino até aqui</footer>
+    </div>
+
   </div>
 </div>
 
@@ -1025,6 +1213,187 @@ function launchConfetti(){
   window.addEventListener("resize", resize);
   resize(); draw();
 })();
+
+/* =========================================================
+   SENHA + TELA ROSA (convite pro jantar)
+   ========================================================= */
+const SENHA_CORRETA = "beijonosso";
+const jantarState = { restauranteId: null, restauranteImg: null, restauranteLabel: null, data: null, email: null };
+
+const modalSenha = document.getElementById("modal-senha");
+const inputSenha = document.getElementById("input-senha");
+const senhaErro = document.getElementById("senha-erro");
+
+document.getElementById("btn-open-senha").addEventListener("click", () => {
+  senhaErro.classList.remove("show");
+  inputSenha.value = "";
+  modalSenha.classList.add("active");
+  setTimeout(() => inputSenha.focus(), 50);
+});
+
+document.getElementById("modal-senha-close").addEventListener("click", () => {
+  modalSenha.classList.remove("active");
+});
+
+modalSenha.addEventListener("click", (e) => {
+  if (e.target.id === "modal-senha") modalSenha.classList.remove("active");
+});
+
+function tentarSenha(){
+  const valor = (inputSenha.value || "").trim().toLowerCase();
+  if (valor === SENHA_CORRETA){
+    modalSenha.classList.remove("active");
+    abrirTelaJantar();
+  } else {
+    senhaErro.classList.add("show");
+  }
+}
+document.getElementById("btn-senha-confirmar").addEventListener("click", tentarSenha);
+inputSenha.addEventListener("keydown", (e) => { if (e.key === "Enter") tentarSenha(); });
+
+function pinkGoTo(stepId){
+  document.querySelectorAll(".pink-step").forEach(s => s.classList.remove("active"));
+  document.getElementById(stepId).classList.add("active");
+}
+
+function abrirTelaJantar(){
+  pinkGoTo("pink-pergunta");
+  document.getElementById("tela-jantar").classList.add("active");
+}
+
+document.getElementById("btn-jantar-sim").addEventListener("click", () => {
+  /* vincula com o restaurante escolhido lá atrás, no ranking de comidas */
+  const comidaTopId = state.comida[0];
+  const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
+  const restauranteImg = comidaTopId ? RESTAURANTES[comidaTopId] : null;
+
+  jantarState.restauranteId = comidaTopId || null;
+  jantarState.restauranteImg = restauranteImg || null;
+  jantarState.restauranteLabel = comidaTop ? comidaTop.label : null;
+
+  const imgEl = document.getElementById("jantar-restaurant-img");
+  const capEl = document.getElementById("jantar-restaurant-cap");
+  if (restauranteImg){
+    imgEl.src = restauranteImg;
+    imgEl.style.display = "block";
+    capEl.textContent = `Nosso jantar vai ser ${comidaTop.label.toLowerCase()}, do jeito que você escolheu.`;
+  } else {
+    imgEl.style.display = "none";
+    capEl.textContent = "Ainda falta você escolher a comida lá em cima pra eu saber o restaurante certo.";
+  }
+
+  playChime();
+  pinkGoTo("pink-restaurante");
+});
+
+/* botão "Não" foge do cursor/toque, igual ao "Em lugar nenhum" */
+attachDodge(document.getElementById("btn-jantar-nao"));
+
+document.getElementById("btn-ir-calendario").addEventListener("click", () => {
+  pinkGoTo("pink-calendario");
+  renderCalendario();
+});
+
+/* ---------- calendário ---------- */
+const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const DIAS_SEMANA = ["D","S","T","Q","Q","S","S"];
+const hoje = new Date();
+hoje.setHours(0,0,0,0);
+let calAno = hoje.getFullYear();
+let calMes = hoje.getMonth();
+
+function renderCalendario(){
+  document.getElementById("cal-month-label").textContent = `${MESES[calMes]} de ${calAno}`;
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = DIAS_SEMANA.map(d => `<div class="dow">${d}</div>`).join("");
+
+  const primeiroDiaSemana = new Date(calAno, calMes, 1).getDay();
+  const totalDias = new Date(calAno, calMes + 1, 0).getDate();
+
+  for (let i = 0; i < primeiroDiaSemana; i++){
+    grid.insertAdjacentHTML("beforeend", `<div class="day disabled"></div>`);
+  }
+
+  for (let dia = 1; dia <= totalDias; dia++){
+    const dataAtual = new Date(calAno, calMes, dia);
+    const desabilitado = dataAtual < hoje;
+    const selecionada = jantarState.data &&
+      jantarState.data.getFullYear() === calAno &&
+      jantarState.data.getMonth() === calMes &&
+      jantarState.data.getDate() === dia;
+
+    grid.insertAdjacentHTML("beforeend",
+      `<div class="day${desabilitado ? " disabled" : ""}${selecionada ? " selected" : ""}" data-dia="${dia}">${dia}</div>`
+    );
+  }
+
+  grid.querySelectorAll(".day:not(.disabled)").forEach(el => {
+    el.addEventListener("click", () => {
+      jantarState.data = new Date(calAno, calMes, parseInt(el.dataset.dia, 10));
+      renderCalendario();
+      setTimeout(() => pinkGoTo("pink-email"), 350);
+    });
+  });
+}
+
+document.getElementById("cal-prev").addEventListener("click", () => {
+  calMes--;
+  if (calMes < 0){ calMes = 11; calAno--; }
+  renderCalendario();
+});
+document.getElementById("cal-next").addEventListener("click", () => {
+  calMes++;
+  if (calMes > 11){ calMes = 0; calAno++; }
+  renderCalendario();
+});
+
+/* ---------- email ---------- */
+function emailValido(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+document.getElementById("btn-email-confirmar").addEventListener("click", async () => {
+  const val = document.getElementById("input-email").value.trim();
+  const erro = document.getElementById("email-erro");
+  if (!emailValido(val)){
+    erro.classList.add("show");
+    return;
+  }
+  erro.classList.remove("show");
+  jantarState.email = val;
+
+  const dataFormatada = jantarState.data
+    ? jantarState.data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })
+    : "uma data ainda por confirmar";
+
+  document.getElementById("pink-final-texto").textContent =
+    `Dia ${dataFormatada}, jantar ${jantarState.restauranteLabel ? jantarState.restauranteLabel.toLowerCase() : ""}. Guarda esse dia — eu vou guardar também.`;
+
+  await salvarConfirmacaoJantar();
+  pinkGoTo("pink-final");
+});
+
+/* ---------- salvar no Supabase ---------- */
+async function salvarConfirmacaoJantar(){
+  if (!supabaseClient) {
+    console.warn("Supabase não configurado ainda — confirmação do jantar não foi salva:", jantarState);
+    return;
+  }
+  try {
+    const { error } = await supabaseClient
+      .from(TABLE_NAME)
+      .insert([{
+        aceitou_jantar: true,
+        restaurante: jantarState.restauranteId,
+        data_jantar: jantarState.data ? jantarState.data.toISOString().slice(0,10) : null,
+        email: jantarState.email,
+        criado_em: new Date().toISOString()
+      }]);
+    if (error) console.error("Erro ao salvar confirmação do jantar no Supabase:", error);
+  } catch (e) {
+    console.error("Falha ao conectar no Supabase (confirmação do jantar):", e);
+  }
+}
 </script>
 </body>
 </html>
