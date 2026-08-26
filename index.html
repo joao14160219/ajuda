@@ -489,6 +489,257 @@
 }
 </style>
 
+<style>
+/* ========== swipe estilo tinder (escolha do restaurante) ========== */
+.swipe-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom:8px;
+}
+.swipe-counter{
+  font-family:'Cinzel', serif;
+  font-size:11px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--gold-soft);
+  opacity:0.75;
+  margin-bottom:14px;
+}
+.swipe-stack{
+  position:relative;
+  width:100%;
+  max-width:300px;
+  aspect-ratio:3/4;
+  margin:0 auto 22px;
+}
+.swipe-card{
+  position:absolute;
+  inset:0;
+  border-radius:8px;
+  overflow:hidden;
+  background-size:cover;
+  background-position:center;
+  border:1px solid var(--line);
+  box-shadow:0 18px 40px rgba(0,0,0,0.45);
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  will-change:transform;
+}
+.swipe-card.top{ cursor:grab; }
+.swipe-card.top:active{ cursor:grabbing; }
+.swipe-card.behind{ transition:transform .25s ease, opacity .25s ease; }
+.swipe-card.returning{ transition:transform .35s cubic-bezier(.2,.8,.3,1); }
+.swipe-card.flying{ transition:transform .45s ease-out, opacity .45s ease-out; }
+.swipe-card::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 45%, rgba(15,11,30,0.85) 100%);
+  pointer-events:none;
+}
+.swipe-label{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:16px 16px 14px;
+  font-family:'Cinzel', serif;
+  font-size:15px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--cream);
+  z-index:1;
+}
+.swipe-stamp{
+  position:absolute;
+  top:22px;
+  padding:6px 14px;
+  font-family:'Cinzel', serif;
+  font-size:16px;
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  border:3px solid;
+  border-radius:4px;
+  opacity:0;
+  z-index:2;
+  pointer-events:none;
+}
+.swipe-stamp.like{
+  left:18px;
+  color:var(--gold-soft);
+  border-color:var(--gold-soft);
+  transform:rotate(-16deg);
+}
+.swipe-stamp.nope{
+  right:18px;
+  color:var(--blush);
+  border-color:var(--blush);
+  transform:rotate(16deg);
+}
+.swipe-actions{
+  display:flex;
+  gap:22px;
+  justify-content:center;
+  margin-bottom:8px;
+}
+.swipe-btn{
+  width:56px; height:56px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:rgba(243,236,221,0.05);
+  color:var(--cream);
+  font-size:22px;
+  line-height:1;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .2s ease, border-color .2s ease, color .2s ease;
+}
+.swipe-btn:hover{ transform:translateY(-2px); }
+.swipe-btn:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:3px; }
+.swipe-btn.nope{ color:var(--blush); }
+.swipe-btn.nope:hover{ border-color:var(--blush); }
+.swipe-btn.like{ color:var(--gold-soft); font-size:24px; }
+.swipe-btn.like:hover{ border-color:var(--gold-soft); }
+.swipe-empty{
+  font-style:italic;
+  font-size:15px;
+  color:rgba(243,236,221,0.6);
+  padding:40px 10px;
+}
+</style>
+
+<style>
+/* ========== campo de flores + buquê ========== */
+.btn:disabled{
+  opacity:0.4;
+  cursor:default;
+  box-shadow:none;
+}
+.btn:disabled:hover{ transform:none; }
+
+.field{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  aspect-ratio:4/3;
+  margin:0 auto 34px;
+}
+.field-flower{
+  position:absolute;
+  width:84px;
+  height:84px;
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.field-flower::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background-image:var(--img);
+  background-size:cover;
+  background-position:center;
+  border:1px solid var(--line);
+  box-shadow:0 8px 20px rgba(0,0,0,0.35);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.field-flower:hover::before{ transform:scale(1.06); }
+.field-flower:active::before{ transform:scale(0.92); }
+.field-flower.bump::before{ animation:fieldBump .3s ease; }
+@keyframes fieldBump{
+  0%{ transform:scale(1.22); }
+  100%{ transform:scale(1); }
+}
+.field-count{
+  position:absolute;
+  top:-6px; right:-2px;
+  width:22px; height:22px;
+  border-radius:50%;
+  background:var(--gold-soft);
+  color:#241226;
+  font-family:'Cinzel', serif;
+  font-size:11px;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0;
+  transform:scale(0.6);
+  transition:opacity .2s ease, transform .2s ease;
+  z-index:2;
+  pointer-events:none;
+}
+.field-flower.has-count .field-count{ opacity:1; transform:scale(1); }
+.field-label{
+  position:absolute;
+  left:50%; bottom:-22px;
+  transform:translateX(-50%);
+  font-family:'Cinzel', serif;
+  font-size:10.5px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--cream);
+  opacity:0.75;
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+.bouquet-wrap{
+  max-width:280px;
+  margin:0 auto 22px;
+  position:relative;
+}
+.bouquet{
+  position:relative;
+  height:110px;
+  margin-bottom:10px;
+}
+.bouquet-stem{
+  position:absolute;
+  bottom:0;
+  width:46px; height:46px;
+  border-radius:50%;
+  background-size:cover;
+  background-position:center;
+  border:1px solid var(--line);
+  box-shadow:0 6px 14px rgba(0,0,0,0.4);
+  animation:stemIn .3s ease;
+}
+@keyframes stemIn{
+  from{ opacity:0; transform:translate(-50%, 14px) scale(0.7) rotate(var(--rot,0deg)); }
+  to{ opacity:1; transform:translate(-50%, 0) scale(1) rotate(var(--rot,0deg)); }
+}
+.bouquet-empty{
+  font-style:italic;
+  color:rgba(243,236,221,0.5);
+  font-size:14px;
+  padding:38px 0;
+  text-align:center;
+}
+.bouquet-ribbon{
+  width:64%;
+  height:10px;
+  margin:0 auto;
+  border-radius:2px;
+  background:linear-gradient(180deg, var(--gold-soft), var(--gold));
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+.sparkle-burst{
+  position:absolute;
+  bottom:46%;
+  font-size:14px;
+  color:var(--gold-soft);
+  opacity:0;
+  pointer-events:none;
+  animation:sparkleFloat 1.1s ease-out forwards;
+}
+@keyframes sparkleFloat{
+  0%{ opacity:0; transform:translateY(0) scale(0.6); }
+  20%{ opacity:1; }
+  100%{ opacity:0; transform:translateY(-60px) scale(1.1); }
+}
+</style>
+
 </head>
 <body>
 
@@ -506,7 +757,7 @@
     <button class="btn" onclick="goTo('comida')">Ler meu destino</button>
   </section>
 
-  <!-- TELA 0.5: COMIDA (ranking) -->
+  <!-- TELA 0.5: COMIDA (swipe estilo tinder) -->
   <section id="screen-comida" class="screen">
     <div class="progress">
       <span class="node active"></span><span class="rule"></span>
@@ -515,9 +766,16 @@
       <span class="node"></span>
     </div>
     <div class="eyebrow">Antes de tudo</div>
-    <h1>Em ordem, quais comidas você mais gosta?</h1>
-    <p class="lead">Clique nas opções na ordem da sua preferência — da que você mais gosta até a que gosta menos.</p>
-    <div class="cards" id="cards-comida"></div>
+    <h1>Desliza pro restaurante que combina com você</h1>
+    <p class="lead">Arraste pra direita se topa, pra esquerda se não é bem a sua praia. Ou use os botões aqui embaixo.</p>
+    <div class="swipe-wrap">
+      <div class="swipe-counter" id="swipe-counter"></div>
+      <div class="swipe-stack" id="swipe-stack"></div>
+      <div class="swipe-actions">
+        <button class="swipe-btn nope" id="btn-swipe-nope" aria-label="Não gosto">&times;</button>
+        <button class="swipe-btn like" id="btn-swipe-like" aria-label="Gosto">&#9829;</button>
+      </div>
+    </div>
   </section>
 
   <!-- TELA 1: FLOR -->
@@ -529,8 +787,14 @@
       <span class="node"></span>
     </div>
     <div class="eyebrow">Segunda carta</div>
-    <h1>Qual é a sua flor preferida?</h1>
-    <div class="cards" id="cards-flor"></div>
+    <h1>Monte o buquê que você levaria pro nosso date</h1>
+    <p class="lead">Toque nas flores que você mais gosta, quantas vezes quiser. Quando o buquê estiver bom, é só confirmar.</p>
+    <div class="field" id="flower-field"></div>
+    <div class="bouquet-wrap">
+      <div class="bouquet" id="bouquet-stems"><div class="bouquet-empty" id="bouquet-empty">seu buquê vai aparecer aqui</div></div>
+      <div class="bouquet-ribbon"></div>
+    </div>
+    <button class="btn" id="btn-bouquet-confirm" disabled>Esse é o meu buquê</button>
   </section>
 
   <!-- TELA 2: COR (depende da flor escolhida) -->
@@ -822,48 +1086,278 @@ function goTo(name){
   document.getElementById("screen-" + name).classList.add("active");
 }
 
-/* Ranking de comidas: clique na ordem de preferência.
-   Cada clique grava a posição e mostra o número na própria carta. */
+/* =========================================================
+   COMIDA / RESTAURANTE — swipe estilo tinder
+   Arraste (ou toque nos botões) pra direita = gosto,
+   pra esquerda = não gosto. A ordem dos "gosto" vira o
+   ranking usado depois pra escolher o restaurante do date.
+   ========================================================= */
+const swipeState = {
+  deck: [],      // itens restantes, o [0] é sempre o card do topo
+  liked: [],     // ids na ordem em que foram curtidos
+  total: 0,
+  dragging: false,
+  startX: 0,
+  startY: 0,
+  currentX: 0,
+  currentY: 0,
+  pointerId: null,
+};
+
 function renderComida(){
-  const el = document.getElementById("cards-comida");
-  el.innerHTML = COMIDAS.map(c => `
-    <button class="text-card" data-id="${c.id}" role="button" tabindex="0">
-      <span class="rank-badge"></span>
-      ${c.label}
-    </button>
-  `).join("");
+  swipeState.deck = COMIDAS.map(c => ({ id: c.id, label: c.label, img: RESTAURANTES[c.id] }));
+  swipeState.liked = [];
+  swipeState.total = swipeState.deck.length;
+  drawSwipeStack();
+}
 
-  el.querySelectorAll(".text-card").forEach(card => {
-    card.addEventListener("click", () => {
-      if (card.classList.contains("selected")) return;
-      state.comida.push(card.dataset.id);
-      card.classList.add("selected");
-      card.querySelector(".rank-badge").textContent = state.comida.length;
-      if (state.comida.length === COMIDAS.length){
-        setTimeout(() => goTo("flor"), 450);
-      }
-    });
+function updateSwipeCounter(){
+  const counter = document.getElementById("swipe-counter");
+  const restantes = swipeState.deck.length;
+  if (restantes === 0){
+    counter.textContent = "";
+    return;
+  }
+  const atual = swipeState.total - restantes + 1;
+  counter.textContent = `${atual} de ${swipeState.total}`;
+}
+
+function drawSwipeStack(){
+  const stack = document.getElementById("swipe-stack");
+  stack.innerHTML = "";
+  updateSwipeCounter();
+
+  if (swipeState.deck.length === 0){
+    stack.innerHTML = `<div class="swipe-empty">Prontinho — vamos ver o que combinou.</div>`;
+    document.getElementById("btn-swipe-nope").disabled = true;
+    document.getElementById("btn-swipe-like").disabled = true;
+    finishSwipe();
+    return;
+  }
+
+  document.getElementById("btn-swipe-nope").disabled = false;
+  document.getElementById("btn-swipe-like").disabled = false;
+
+  /* mostra até 3 cartas, a de baixo pra cima, pra dar profundidade */
+  const visiveis = swipeState.deck.slice(0, 3);
+  for (let i = visiveis.length - 1; i >= 0; i--){
+    const item = visiveis[i];
+    const card = document.createElement("div");
+    card.className = "swipe-card" + (i === 0 ? " top" : " behind");
+    card.style.backgroundImage = `url(${item.img})`;
+    card.style.zIndex = String(10 - i);
+    if (i > 0){
+      card.style.transform = `translateY(${i * 8}px) scale(${1 - i * 0.04})`;
+      card.style.opacity = i === 1 ? "0.85" : "0.6";
+    }
+    card.innerHTML = `
+      <div class="swipe-stamp like">SIM</div>
+      <div class="swipe-stamp nope">NÃO</div>
+      <div class="swipe-label">${item.label}</div>
+    `;
+    stack.appendChild(card);
+    if (i === 0) attachSwipeHandlers(card, item);
+  }
+}
+
+function attachSwipeHandlers(card, item){
+  card.addEventListener("pointerdown", (e) => {
+    swipeState.dragging = true;
+    swipeState.startX = e.clientX;
+    swipeState.startY = e.clientY;
+    swipeState.currentX = 0;
+    swipeState.currentY = 0;
+    swipeState.pointerId = e.pointerId;
+    card.setPointerCapture(e.pointerId);
+    card.classList.remove("returning", "flying");
+  });
+
+  card.addEventListener("pointermove", (e) => {
+    if (!swipeState.dragging || e.pointerId !== swipeState.pointerId) return;
+    swipeState.currentX = e.clientX - swipeState.startX;
+    swipeState.currentY = e.clientY - swipeState.startY;
+    const rot = swipeState.currentX / 14;
+    card.style.transform = `translate(${swipeState.currentX}px, ${swipeState.currentY}px) rotate(${rot}deg)`;
+
+    const likeStamp = card.querySelector(".swipe-stamp.like");
+    const nopeStamp = card.querySelector(".swipe-stamp.nope");
+    const intensity = Math.min(Math.abs(swipeState.currentX) / 100, 1);
+    if (swipeState.currentX > 0){
+      likeStamp.style.opacity = String(intensity);
+      nopeStamp.style.opacity = "0";
+    } else {
+      nopeStamp.style.opacity = String(intensity);
+      likeStamp.style.opacity = "0";
+    }
+  });
+
+  function endDrag(e){
+    if (!swipeState.dragging || e.pointerId !== swipeState.pointerId) return;
+    swipeState.dragging = false;
+    const dx = swipeState.currentX;
+    const threshold = 90;
+
+    if (dx > threshold){
+      commitSwipe(card, item, "right");
+    } else if (dx < -threshold){
+      commitSwipe(card, item, "left");
+    } else {
+      card.classList.add("returning");
+      card.style.transform = "translate(0,0) rotate(0)";
+      card.querySelector(".swipe-stamp.like").style.opacity = "0";
+      card.querySelector(".swipe-stamp.nope").style.opacity = "0";
+    }
+  }
+
+  card.addEventListener("pointerup", endDrag);
+  card.addEventListener("pointercancel", endDrag);
+}
+
+function commitSwipe(card, item, direction){
+  if (navigator.vibrate) navigator.vibrate(15);
+  const flyX = direction === "right" ? window.innerWidth : -window.innerWidth;
+  const rot = direction === "right" ? 24 : -24;
+  card.classList.add("flying");
+  card.style.transform = `translate(${flyX}px, ${swipeState.currentY}px) rotate(${rot}deg)`;
+  card.style.opacity = "0";
+
+  if (direction === "right") swipeState.liked.push(item.id);
+  swipeState.deck.shift();
+
+  setTimeout(() => drawSwipeStack(), 280);
+}
+
+/* botões (curtir/recusar o card do topo, sem precisar arrastar) */
+document.getElementById("btn-swipe-like").addEventListener("click", () => {
+  const top = document.querySelector(".swipe-card.top");
+  if (!top || swipeState.deck.length === 0) return;
+  swipeState.currentY = 0;
+  commitSwipe(top, swipeState.deck[0], "right");
+});
+document.getElementById("btn-swipe-nope").addEventListener("click", () => {
+  const top = document.querySelector(".swipe-card.top");
+  if (!top || swipeState.deck.length === 0) return;
+  swipeState.currentY = 0;
+  commitSwipe(top, swipeState.deck[0], "left");
+});
+
+function finishSwipe(){
+  /* usa a ordem dos "sim"; se ela não curtiu nenhum, cai pro primeiro
+     da lista original só pra sempre existir um restaurante no final */
+  state.comida = swipeState.liked.length > 0 ? swipeState.liked : [COMIDAS[0].id];
+  setTimeout(() => goTo("flor"), 500);
+}
+
+/* =========================================================
+   FLOR — campo de flores + buquê
+   Ela toca nas flores quantas vezes quiser (cada toque "colhe"
+   uma flor pro buquê). A flor mais colhida vence; empate é
+   resolvido pela última flor tocada entre as empatadas.
+   ========================================================= */
+const FIELD_SPOTS = [
+  { top: "4%",  left: "6%",  rot: -7 },
+  { top: "0%",  left: "58%", rot: 6 },
+  { top: "56%", left: "2%",  rot: 5 },
+  { top: "60%", left: "56%", rot: -5 },
+];
+
+const bouquetState = { counts: {}, order: [], milestonesShown: new Set() };
+const BOUQUET_MILESTONES = [3, 5, 8];
+const BOUQUET_MIN = 3;
+
+function renderFlowerField(){
+  const field = document.getElementById("flower-field");
+  field.innerHTML = FLORES.map((f, i) => {
+    const spot = FIELD_SPOTS[i % FIELD_SPOTS.length];
+    const img = f.thumb || f.img;
+    return `
+      <button type="button" class="field-flower" data-id="${f.id}"
+        style="top:${spot.top}; left:${spot.left}; --img:url('${img}'); --rot:${spot.rot}deg;">
+        <span class="field-count">0</span>
+        <span class="field-label">${f.label}</span>
+      </button>
+    `;
+  }).join("");
+
+  field.querySelectorAll(".field-flower").forEach(btn => {
+    btn.addEventListener("click", () => pickFlower(btn.dataset.id));
   });
 }
 
-function renderCards(containerId, items, field, onSelect){
-  const el = document.getElementById(containerId);
-  el.innerHTML = items.map(item => `
-    <button class="card" data-id="${item.id}" role="button" tabindex="0">
-      <img src="${item.thumb || item.img}" alt="${item.label}" loading="lazy">
-      <div class="label">${item.label}</div>
-    </button>
-  `).join("");
+function pickFlower(id){
+  bouquetState.counts[id] = (bouquetState.counts[id] || 0) + 1;
+  bouquetState.order.push(id);
 
-  el.querySelectorAll(".card").forEach(card => {
-    card.addEventListener("click", () => {
-      el.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      state[field] = card.dataset.id;
-      setTimeout(() => onSelect(), 260);
-    });
-  });
+  const btn = document.querySelector(`.field-flower[data-id="${id}"]`);
+  btn.querySelector(".field-count").textContent = bouquetState.counts[id];
+  btn.classList.add("has-count");
+  btn.classList.remove("bump");
+  void btn.offsetWidth;
+  btn.classList.add("bump");
+
+  addBouquetStem(id);
+  checkBouquetMilestone();
+
+  document.getElementById("btn-bouquet-confirm").disabled = bouquetState.order.length < BOUQUET_MIN;
+  if (navigator.vibrate) navigator.vibrate(10);
 }
+
+function addBouquetStem(id){
+  const bouquet = document.getElementById("bouquet-stems");
+  const empty = document.getElementById("bouquet-empty");
+  if (empty) empty.remove();
+
+  const flor = FLORES.find(f => f.id === id);
+  const img = flor.thumb || flor.img;
+  const idx = bouquetState.order.length - 1;
+  const dir = idx % 2 === 0 ? -1 : 1;
+  const offset = Math.ceil((idx + 1) / 2) * 22 * dir;
+  const rot = offset / 3;
+
+  const stem = document.createElement("div");
+  stem.className = "bouquet-stem";
+  stem.style.backgroundImage = `url(${img})`;
+  stem.style.left = `calc(50% + ${offset}px)`;
+  stem.style.setProperty("--rot", `${rot}deg`);
+  stem.style.zIndex = String(idx + 1);
+  bouquet.appendChild(stem);
+}
+
+function checkBouquetMilestone(){
+  const total = bouquetState.order.length;
+  if (!BOUQUET_MILESTONES.includes(total) || bouquetState.milestonesShown.has(total)) return;
+  bouquetState.milestonesShown.add(total);
+
+  const wrap = document.querySelector(".bouquet-wrap");
+  for (let i = 0; i < 6; i++){
+    const s = document.createElement("span");
+    s.className = "sparkle-burst";
+    s.textContent = "✦";
+    s.style.left = (20 + Math.random() * 60) + "%";
+    s.style.animationDelay = (Math.random() * 0.3) + "s";
+    wrap.appendChild(s);
+    setTimeout(() => s.remove(), 1300);
+  }
+}
+
+function resolveBouquetWinner(){
+  const counts = bouquetState.counts;
+  const maxCount = Math.max(...Object.values(counts));
+  const candidates = Object.keys(counts).filter(id => counts[id] === maxCount);
+  if (candidates.length === 1) return candidates[0];
+
+  for (let i = bouquetState.order.length - 1; i >= 0; i--){
+    if (candidates.includes(bouquetState.order[i])) return bouquetState.order[i];
+  }
+  return candidates[0];
+}
+
+document.getElementById("btn-bouquet-confirm").addEventListener("click", () => {
+  if (bouquetState.order.length < BOUQUET_MIN) return;
+  state.flor = resolveBouquetWinner();
+  renderSwatchesForFlor();
+  goTo("cor");
+});
 
 /* Tela de cor depende da flor escolhida: usa as cores reais da flor
    (se existirem) ou a paleta genérica pra retingir a foto base */
@@ -940,12 +1434,9 @@ function attachDodge(el){
   el.addEventListener("focus", flee);
 }
 
-/* fluxo: comida -> flor -> cor (dinâmica pra flor escolhida) -> beijo */
+/* fluxo: comida (swipe) -> flor (buquê) -> cor (dinâmica pra flor escolhida) -> beijo */
 renderComida();
-renderCards("cards-flor", FLORES, "flor", () => {
-  renderSwatchesForFlor();
-  goTo("cor");
-});
+renderFlowerField();
 renderBeijo();
 
 /* =========================================================
@@ -1278,7 +1769,7 @@ function abrirTelaJantar(){
 }
 
 document.getElementById("btn-jantar-sim").addEventListener("click", () => {
-  /* vincula com o restaurante escolhido lá atrás, no ranking de comidas */
+  /* vincula com o restaurante escolhido lá atrás, no swipe de comidas */
   const comidaTopId = state.comida[0];
   const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
   const restauranteImg = comidaTopId ? RESTAURANTES[comidaTopId] : null;
