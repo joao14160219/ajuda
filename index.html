@@ -608,138 +608,6 @@
 }
 </style>
 
-<style>
-/* ========== campo de flores + buquê ========== */
-.btn:disabled{
-  opacity:0.4;
-  cursor:default;
-  box-shadow:none;
-}
-.btn:disabled:hover{ transform:none; }
-
-.field{
-  position:relative;
-  width:100%;
-  max-width:420px;
-  aspect-ratio:4/3;
-  margin:0 auto 34px;
-}
-.field-flower{
-  position:absolute;
-  width:84px;
-  height:84px;
-  border:none;
-  background:none;
-  padding:0;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
-.field-flower::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:50%;
-  background-image:var(--img);
-  background-size:cover;
-  background-position:center;
-  border:1px solid var(--line);
-  box-shadow:0 8px 20px rgba(0,0,0,0.35);
-  transition:transform .18s ease, box-shadow .18s ease;
-}
-.field-flower:hover::before{ transform:scale(1.06); }
-.field-flower:active::before{ transform:scale(0.92); }
-.field-flower.bump::before{ animation:fieldBump .3s ease; }
-@keyframes fieldBump{
-  0%{ transform:scale(1.22); }
-  100%{ transform:scale(1); }
-}
-.field-count{
-  position:absolute;
-  top:-6px; right:-2px;
-  width:22px; height:22px;
-  border-radius:50%;
-  background:var(--gold-soft);
-  color:#241226;
-  font-family:'Cinzel', serif;
-  font-size:11px;
-  display:flex; align-items:center; justify-content:center;
-  opacity:0;
-  transform:scale(0.6);
-  transition:opacity .2s ease, transform .2s ease;
-  z-index:2;
-  pointer-events:none;
-}
-.field-flower.has-count .field-count{ opacity:1; transform:scale(1); }
-.field-label{
-  position:absolute;
-  left:50%; bottom:-22px;
-  transform:translateX(-50%);
-  font-family:'Cinzel', serif;
-  font-size:10.5px;
-  letter-spacing:0.05em;
-  text-transform:uppercase;
-  color:var(--cream);
-  opacity:0.75;
-  white-space:nowrap;
-  pointer-events:none;
-}
-
-.bouquet-wrap{
-  max-width:280px;
-  margin:0 auto 22px;
-  position:relative;
-}
-.bouquet{
-  position:relative;
-  height:110px;
-  margin-bottom:10px;
-}
-.bouquet-stem{
-  position:absolute;
-  bottom:0;
-  width:46px; height:46px;
-  border-radius:50%;
-  background-size:cover;
-  background-position:center;
-  border:1px solid var(--line);
-  box-shadow:0 6px 14px rgba(0,0,0,0.4);
-  animation:stemIn .3s ease;
-}
-@keyframes stemIn{
-  from{ opacity:0; transform:translate(-50%, 14px) scale(0.7) rotate(var(--rot,0deg)); }
-  to{ opacity:1; transform:translate(-50%, 0) scale(1) rotate(var(--rot,0deg)); }
-}
-.bouquet-empty{
-  font-style:italic;
-  color:rgba(243,236,221,0.5);
-  font-size:14px;
-  padding:38px 0;
-  text-align:center;
-}
-.bouquet-ribbon{
-  width:64%;
-  height:10px;
-  margin:0 auto;
-  border-radius:2px;
-  background:linear-gradient(180deg, var(--gold-soft), var(--gold));
-  box-shadow:0 4px 10px rgba(0,0,0,0.3);
-}
-.sparkle-burst{
-  position:absolute;
-  bottom:46%;
-  font-size:14px;
-  color:var(--gold-soft);
-  opacity:0;
-  pointer-events:none;
-  animation:sparkleFloat 1.1s ease-out forwards;
-}
-@keyframes sparkleFloat{
-  0%{ opacity:0; transform:translateY(0) scale(0.6); }
-  20%{ opacity:1; }
-  100%{ opacity:0; transform:translateY(-60px) scale(1.1); }
-}
-</style>
-
 </head>
 <body>
 
@@ -787,14 +655,8 @@
       <span class="node"></span>
     </div>
     <div class="eyebrow">Segunda carta</div>
-    <h1>Monte o buquê que você levaria pro nosso date</h1>
-    <p class="lead">Toque nas flores que você mais gosta, quantas vezes quiser. Quando o buquê estiver bom, é só confirmar.</p>
-    <div class="field" id="flower-field"></div>
-    <div class="bouquet-wrap">
-      <div class="bouquet" id="bouquet-stems"><div class="bouquet-empty" id="bouquet-empty">seu buquê vai aparecer aqui</div></div>
-      <div class="bouquet-ribbon"></div>
-    </div>
-    <button class="btn" id="btn-bouquet-confirm" disabled>Esse é o meu buquê</button>
+    <h1>Qual é a sua flor preferida?</h1>
+    <div class="cards" id="cards-flor"></div>
   </section>
 
   <!-- TELA 2: COR (depende da flor escolhida) -->
@@ -1248,116 +1110,24 @@ function finishSwipe(){
   setTimeout(() => goTo("flor"), 500);
 }
 
-/* =========================================================
-   FLOR — campo de flores + buquê
-   Ela toca nas flores quantas vezes quiser (cada toque "colhe"
-   uma flor pro buquê). A flor mais colhida vence; empate é
-   resolvido pela última flor tocada entre as empatadas.
-   ========================================================= */
-const FIELD_SPOTS = [
-  { top: "4%",  left: "6%",  rot: -7 },
-  { top: "0%",  left: "58%", rot: 6 },
-  { top: "56%", left: "2%",  rot: 5 },
-  { top: "60%", left: "56%", rot: -5 },
-];
+function renderCards(containerId, items, field, onSelect){
+  const el = document.getElementById(containerId);
+  el.innerHTML = items.map(item => `
+    <button class="card" data-id="${item.id}" role="button" tabindex="0">
+      <img src="${item.thumb || item.img}" alt="${item.label}" loading="lazy">
+      <div class="label">${item.label}</div>
+    </button>
+  `).join("");
 
-const bouquetState = { counts: {}, order: [], milestonesShown: new Set() };
-const BOUQUET_MILESTONES = [3, 5, 8];
-const BOUQUET_MIN = 3;
-
-function renderFlowerField(){
-  const field = document.getElementById("flower-field");
-  field.innerHTML = FLORES.map((f, i) => {
-    const spot = FIELD_SPOTS[i % FIELD_SPOTS.length];
-    const img = f.thumb || f.img;
-    return `
-      <button type="button" class="field-flower" data-id="${f.id}"
-        style="top:${spot.top}; left:${spot.left}; --img:url('${img}'); --rot:${spot.rot}deg;">
-        <span class="field-count">0</span>
-        <span class="field-label">${f.label}</span>
-      </button>
-    `;
-  }).join("");
-
-  field.querySelectorAll(".field-flower").forEach(btn => {
-    btn.addEventListener("click", () => pickFlower(btn.dataset.id));
+  el.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => {
+      el.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      state[field] = card.dataset.id;
+      setTimeout(() => onSelect(), 260);
+    });
   });
 }
-
-function pickFlower(id){
-  bouquetState.counts[id] = (bouquetState.counts[id] || 0) + 1;
-  bouquetState.order.push(id);
-
-  const btn = document.querySelector(`.field-flower[data-id="${id}"]`);
-  btn.querySelector(".field-count").textContent = bouquetState.counts[id];
-  btn.classList.add("has-count");
-  btn.classList.remove("bump");
-  void btn.offsetWidth;
-  btn.classList.add("bump");
-
-  addBouquetStem(id);
-  checkBouquetMilestone();
-
-  document.getElementById("btn-bouquet-confirm").disabled = bouquetState.order.length < BOUQUET_MIN;
-  if (navigator.vibrate) navigator.vibrate(10);
-}
-
-function addBouquetStem(id){
-  const bouquet = document.getElementById("bouquet-stems");
-  const empty = document.getElementById("bouquet-empty");
-  if (empty) empty.remove();
-
-  const flor = FLORES.find(f => f.id === id);
-  const img = flor.thumb || flor.img;
-  const idx = bouquetState.order.length - 1;
-  const dir = idx % 2 === 0 ? -1 : 1;
-  const offset = Math.ceil((idx + 1) / 2) * 22 * dir;
-  const rot = offset / 3;
-
-  const stem = document.createElement("div");
-  stem.className = "bouquet-stem";
-  stem.style.backgroundImage = `url(${img})`;
-  stem.style.left = `calc(50% + ${offset}px)`;
-  stem.style.setProperty("--rot", `${rot}deg`);
-  stem.style.zIndex = String(idx + 1);
-  bouquet.appendChild(stem);
-}
-
-function checkBouquetMilestone(){
-  const total = bouquetState.order.length;
-  if (!BOUQUET_MILESTONES.includes(total) || bouquetState.milestonesShown.has(total)) return;
-  bouquetState.milestonesShown.add(total);
-
-  const wrap = document.querySelector(".bouquet-wrap");
-  for (let i = 0; i < 6; i++){
-    const s = document.createElement("span");
-    s.className = "sparkle-burst";
-    s.textContent = "✦";
-    s.style.left = (20 + Math.random() * 60) + "%";
-    s.style.animationDelay = (Math.random() * 0.3) + "s";
-    wrap.appendChild(s);
-    setTimeout(() => s.remove(), 1300);
-  }
-}
-
-function resolveBouquetWinner(){
-  const counts = bouquetState.counts;
-  const maxCount = Math.max(...Object.values(counts));
-  const candidates = Object.keys(counts).filter(id => counts[id] === maxCount);
-  if (candidates.length === 1) return candidates[0];
-
-  for (let i = bouquetState.order.length - 1; i >= 0; i--){
-    if (candidates.includes(bouquetState.order[i])) return bouquetState.order[i];
-  }
-  return candidates[0];
-}
-
-document.getElementById("btn-bouquet-confirm").addEventListener("click", () => {
-  if (bouquetState.order.length < BOUQUET_MIN) return;
-  state.flor = resolveBouquetWinner();
-  renderSwatchesForFlor();
-  goTo("cor");
-});
 
 /* Tela de cor depende da flor escolhida: usa as cores reais da flor
    (se existirem) ou a paleta genérica pra retingir a foto base */
@@ -1434,9 +1204,12 @@ function attachDodge(el){
   el.addEventListener("focus", flee);
 }
 
-/* fluxo: comida (swipe) -> flor (buquê) -> cor (dinâmica pra flor escolhida) -> beijo */
+/* fluxo: comida (swipe) -> flor -> cor (dinâmica pra flor escolhida) -> beijo */
 renderComida();
-renderFlowerField();
+renderCards("cards-flor", FLORES, "flor", () => {
+  renderSwatchesForFlor();
+  goTo("cor");
+});
 renderBeijo();
 
 /* =========================================================
