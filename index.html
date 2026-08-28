@@ -250,6 +250,217 @@
     transition:top .28s ease, left .28s ease, transform .25s ease;
   }
 
+  .selo{
+    width:44px;height:44px;margin:0 auto 14px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:#241226;
+    background:radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold));
+    box-shadow:0 0 18px rgba(201,163,99,0.4);
+    transition:transform .4s ease, opacity .4s ease;
+    }
+    .modal-box.abrindo .selo{ transform:scale(1.6) rotate(20deg); opacity:0; }
+    .modal-box.shake{ animation:shake .4s ease; }
+    @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(7px)}
+    60%{transform:translateX(-5px)}
+    80%{transform:translateX(4px)}
+    }
+    #btn-jantar-sim{ transition:transform .3s ease, box-shadow .3s ease; }
+
+/* ========== envelope (senha) ========== */
+.envelope-wrap{
+  position:relative;
+  width:100%;
+  max-width:320px;
+  margin:0 auto;
+  perspective:900px;
+}
+.envelope{
+  position:relative;
+  width:100%;
+  aspect-ratio:5/3.4;
+  transform-style:preserve-3d;
+}
+.envelope-back{
+  position:absolute; inset:0;
+  background:linear-gradient(160deg, #3a2548 0%, var(--plum) 55%, #1a0f24 100%);
+  border:1px solid var(--line);
+  border-radius:4px 4px 6px 6px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.45);
+}
+.envelope-flap{
+  position:absolute;
+  left:0; right:0; top:0;
+  height:52%;
+  transform-origin:top center;
+  transform:rotateX(0deg);
+  transition:transform 1.1s cubic-bezier(.4,.05,.2,1);
+  z-index:3;
+  pointer-events:none;
+}
+.envelope-flap::before{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, var(--plum-light) 0%, #2a1838 100%);
+  border:1px solid var(--line);
+  border-bottom:none;
+  clip-path:polygon(0 0, 100% 0, 50% 100%);
+  box-shadow:0 6px 16px rgba(0,0,0,0.25);
+}
+.envelope.open .envelope-flap{
+  transform:rotateX(180deg);
+}
+.envelope-body{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:62%;
+  background:linear-gradient(180deg, #2a1838 0%, var(--plum) 40%, #1a0f24 100%);
+  border:1px solid var(--line);
+  border-top:none;
+  border-radius:0 0 6px 6px;
+  z-index:2;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:10px;
+}
+.envelope-seal{
+  position:absolute;
+  left:50%; top:38%;
+  transform:translate(-50%, -50%);
+  width:48px; height:48px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 28%, #E8C878 0%, #C9A363 45%, #8B6914 100%);
+  box-shadow:
+    0 0 18px rgba(201,163,99,0.5),
+    inset 0 2px 3px rgba(255,255,255,0.35),
+    inset 0 -3px 6px rgba(80,40,10,0.35);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; color:#3a2410;
+  z-index:4;
+  transition:transform .45s ease, opacity .45s ease, filter .3s ease;
+  border:1px solid rgba(139,105,20,0.4);
+}
+.envelope-seal::before{
+  content:"";
+  position:absolute; inset:6px;
+  border-radius:50%;
+  border:1px dashed rgba(58,36,16,0.25);
+  pointer-events:none;
+}
+.envelope.open:not(.seal-breaking) .envelope-seal{
+  /* selo fica um pouco mais alto quando a carta sobe, mas visível até acertar */
+  transform:translate(-50%, -120%) scale(.92);
+  opacity:.95;
+}
+.envelope.seal-breaking .envelope-seal{
+  animation: sealCrack .7s ease forwards;
+}
+@keyframes sealCrack{
+  0%{ transform:translate(-50%, -120%) scale(.92) rotate(0deg); opacity:1; filter:none; }
+  25%{ transform:translate(-50%, -120%) scale(1.15) rotate(-8deg); }
+  45%{ transform:translate(-50%, -120%) scale(1.05) rotate(6deg); filter:brightness(1.3); }
+  70%{ transform:translate(-50%, -100%) scale(1.2) rotate(-12deg); opacity:.7; filter:brightness(1.5); }
+  100%{ transform:translate(-50%, -80%) scale(1.4) rotate(20deg); opacity:0; filter:blur(2px); }
+}
+/* estilhaços do selo */
+.seal-shards{
+  position:absolute;
+  left:50%; top:38%;
+  width:0; height:0;
+  z-index:6;
+  pointer-events:none;
+}
+.seal-shards span{
+  position:absolute;
+  width:10px; height:10px;
+  border-radius:2px;
+  background:radial-gradient(circle at 30% 30%, #E8C878, #C9A363 60%, #8B6914);
+  opacity:0;
+}
+.envelope.seal-breaking .seal-shards span{
+  animation: shardFly .75s ease-out forwards;
+}
+.envelope.seal-breaking .seal-shards span:nth-child(1){ --dx:-42px; --dy:-36px; --rot:-40deg; animation-delay:0.05s; }
+.envelope.seal-breaking .seal-shards span:nth-child(2){ --dx:48px; --dy:-28px; --rot:55deg; animation-delay:0.08s; }
+.envelope.seal-breaking .seal-shards span:nth-child(3){ --dx:-36px; --dy:30px; --rot:25deg; animation-delay:0.1s; }
+.envelope.seal-breaking .seal-shards span:nth-child(4){ --dx:40px; --dy:34px; --rot:-60deg; animation-delay:0.06s; }
+.envelope.seal-breaking .seal-shards span:nth-child(5){ --dx:8px; --dy:-48px; --rot:15deg; animation-delay:0.12s; }
+.envelope.seal-breaking .seal-shards span:nth-child(6){ --dx:-10px; --dy:44px; --rot:-20deg; animation-delay:0.09s; }
+@keyframes shardFly{
+  0%{ transform:translate(0,0) rotate(0deg) scale(1); opacity:1; }
+  100%{ transform:translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(.4); opacity:0; }
+}
+.envelope-letter{
+  position:absolute;
+  left:8%; right:8%;
+  bottom:18%;
+  top:22%;
+  background:linear-gradient(180deg, var(--cream) 0%, #e8dfc8 100%);
+  border-radius:3px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.3);
+  z-index:1;
+  padding:18px 14px 14px;
+  transform:translateY(8px);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .7s ease .35s, opacity .5s ease .35s;
+  overflow:auto;
+  color:var(--ink);
+  text-align:center;
+}
+.envelope.open .envelope-letter{
+  transform:translateY(-28px);
+  opacity:1;
+  z-index:5;
+  pointer-events:auto;
+}
+.envelope-letter .letter-q{
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic;
+  font-size:17px;
+  line-height:1.35;
+  color:var(--plum);
+  margin:0 0 12px;
+}
+.envelope-letter .field-input{
+  background:rgba(44,27,61,0.06);
+  border-color:rgba(44,27,61,0.25);
+  color:var(--plum);
+}
+.envelope-letter .field-input:focus{ border-color:var(--gold); }
+.envelope-letter .field-input::placeholder{ color:rgba(44,27,61,0.4); }
+.envelope-letter .btn{
+  margin-top:12px;
+  padding:12px 22px;
+  font-size:12px;
+}
+.envelope-letter .senha-erro{
+  color:var(--rose-deep);
+  margin-top:8px;
+}
+.envelope-wrap.shake{ animation:shake .4s ease; }
+.modal-overlay.envelope-mode{
+  background:rgba(15,11,30,0.82);
+}
+.modal-overlay.envelope-mode .modal-box{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  padding:12px 8px 8px;
+  max-width:360px;
+}
+.modal-overlay.envelope-mode .modal-close{
+  top:0; right:4px;
+  z-index:10;
+}
+
+
+
   .rank-badge{
     position:absolute;
     top:8px; right:8px;
@@ -341,8 +552,148 @@
     margin:0 0 16px;
   }
 
+  .cap.typing::after{
+    content:"▍";
+    margin-left:2px;
+    color:var(--gold-soft);
+    animation:blinkCaret .8s step-end infinite;
+  }
+  @keyframes blinkCaret{
+    50%{ opacity:0; }
+  }
+
+  .ranking-card{
+    border:1px solid var(--line);
+    background:rgba(0,0,0,0.2);
+    border-radius:4px;
+    padding:16px 18px 14px;
+    margin-bottom:18px;
+    text-align:center;
+  }
+  .ranking-card .rank-title{
+    font-family:'Cinzel', serif;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+    margin:0 0 8px;
+    opacity:0.9;
+  }
+  .ranking-card .rank-hint{
+    font-style:italic;
+    font-size:14px;
+    color:rgba(243,236,221,0.65);
+    margin:0 0 14px;
+  }
+  .ranking-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+  }
+  .ranking-list li{
+    display:inline-flex;
+    align-items:center;
+    padding:8px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:rgba(243,236,221,0.04);
+    font-family:'Cinzel', serif;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--cream);
+    opacity:0;
+    transform:translateY(6px);
+    animation:rankIn .4s ease forwards;
+  }
+  @keyframes rankIn{
+    to{ opacity:1; transform:translateY(0); }
+  }
+
   .screen{ display:none; }
   .screen.active{ display:block; }
+
+  /* transição de conto de fadas entre perguntas */
+  .stage.tale-out{
+    animation: taleOut .55s ease forwards;
+  }
+  .stage.tale-in{
+    animation: taleIn .7s ease forwards;
+  }
+  @keyframes taleOut{
+    0%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0) brightness(1); }
+    100%{ opacity:0; transform:translateY(-18px) scale(0.97); filter:blur(6px) brightness(1.25); }
+  }
+  @keyframes taleIn{
+    0%{ opacity:0; transform:translateY(22px) scale(0.97); filter:blur(8px) brightness(1.3); }
+    60%{ opacity:1; filter:blur(1px) brightness(1.08); }
+    100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0) brightness(1); }
+  }
+
+  #fairy-veil{
+    position:fixed; inset:0; z-index:45;
+    pointer-events:none;
+    opacity:0;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(243,236,221,0.55) 0%, rgba(228,201,138,0.25) 35%, transparent 70%);
+    transition: opacity .15s ease;
+  }
+  #fairy-veil.active{
+    animation: fairyBloom .9s ease forwards;
+  }
+  @keyframes fairyBloom{
+    0%{ opacity:0; transform:scale(.85); }
+    35%{ opacity:.85; transform:scale(1.05); }
+    100%{ opacity:0; transform:scale(1.2); }
+  }
+  #fairy-veil .dust{
+    position:absolute;
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--gold-soft);
+    box-shadow:0 0 8px var(--gold-soft);
+    opacity:0;
+  }
+  #fairy-veil.active .dust{
+    animation: dustFloat .9s ease-out forwards;
+  }
+  #fairy-veil .dust:nth-child(1){ left:20%; top:40%; animation-delay:.05s; }
+  #fairy-veil .dust:nth-child(2){ left:35%; top:55%; animation-delay:.12s; }
+  #fairy-veil .dust:nth-child(3){ left:50%; top:35%; animation-delay:.08s; }
+  #fairy-veil .dust:nth-child(4){ left:65%; top:50%; animation-delay:.15s; }
+  #fairy-veil .dust:nth-child(5){ left:80%; top:42%; animation-delay:.1s; }
+  #fairy-veil .dust:nth-child(6){ left:28%; top:62%; animation-delay:.18s; }
+  #fairy-veil .dust:nth-child(7){ left:72%; top:60%; animation-delay:.14s; }
+  #fairy-veil .dust:nth-child(8){ left:45%; top:68%; animation-delay:.2s; }
+  @keyframes dustFloat{
+    0%{ opacity:0; transform:translateY(0) scale(.5); }
+    30%{ opacity:1; }
+    100%{ opacity:0; transform:translateY(-60px) scale(1.2); }
+  }
+
+  /* modo noite (depois das 18h) */
+  body.night{
+    background:
+      radial-gradient(ellipse at 20% 15%, rgba(90,30,50,0.45), transparent 55%),
+      radial-gradient(ellipse at 80% 85%, rgba(40,25,70,0.7), transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(201,163,99,0.12), transparent 45%),
+      linear-gradient(180deg, #07050f 0%, #100a1c 50%, #0a0612 100%);
+  }
+  body.night #stars{ opacity:1.15; }
+  body.night .eyebrow{ color:#E8D4A0; }
+  body.night .btn{
+    box-shadow:0 8px 28px rgba(201,163,99,0.35);
+  }
+  body.night .pink-overlay{
+    background:
+      radial-gradient(ellipse at 25% 20%, rgba(180,90,100,0.45), transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(90,30,50,0.65), transparent 55%),
+      linear-gradient(180deg, #2a1018 0%, #1a0c14 60%, #12080e 100%);
+  }
 
   footer.note{
     margin-top:28px;
@@ -613,6 +964,10 @@
 
 <canvas id="stars"></canvas>
 <canvas id="confetti"></canvas>
+<div id="fairy-veil" aria-hidden="true">
+  <span class="dust"></span><span class="dust"></span><span class="dust"></span><span class="dust"></span>
+  <span class="dust"></span><span class="dust"></span><span class="dust"></span><span class="dust"></span>
+</div>
 <div id="oracle-flash"></div>
 
 <div class="stage">
@@ -719,9 +1074,13 @@
 <div class="cap" id="cap-restaurant"></div>
 </div>
 
-    <button class="btn" id="btn-confirm">Vamos tornar isso real?</button>
+    <div class="ranking-card" id="ranking-card" hidden>
+      <p class="rank-title">Comidas escolhidas</p>
+      <p class="rank-hint">Uma dessas será o nosso jantar</p>
+      <ul class="ranking-list" id="ranking-list"></ul>
+    </div>
 
-    <button class="btn ghost" id="btn-open-senha" style="margin-top:14px;">tenho uma senha</button>
+    <button class="btn" id="btn-open-senha" style="margin-top:8px;">tenho uma senha</button>
 
     <footer class="note">feito à mão, sem nenhuma IA prevendo nada — só eu, torcendo</footer>
   </section>
@@ -750,15 +1109,27 @@
   </div>
 </div>
 
-<!-- POP UP: senha -->
-<div class="modal-overlay" id="modal-senha">
-  <div class="modal-box">
+<!-- POP UP: senha (envelope) -->
+<div class="modal-overlay envelope-mode" id="modal-senha">
+  <div class="modal-box" id="senha-box">
     <button class="modal-close" id="modal-senha-close" aria-label="Fechar">&times;</button>
-    <div class="modal-content">
-      <p class="modal-text">essa parte é só pra quem sabe a senha certa.</p>
-      <input type="password" id="input-senha" class="field-input" placeholder="digite a senha" autocomplete="off">
-      <button class="btn" id="btn-senha-confirmar" style="margin-top:16px;">Entrar</button>
-      <p class="senha-erro" id="senha-erro">senha errada, tenta de novo</p>
+    <div class="envelope-wrap" id="envelope-wrap">
+      <div class="envelope" id="envelope">
+        <div class="envelope-back"></div>
+        <div class="envelope-letter">
+          <p class="letter-q">Qual o prato que o João sabe fazer melhor? 🍝</p>
+          <input type="text" id="input-senha" class="field-input" placeholder="sua resposta" autocomplete="off">
+          <p class="senha-erro" id="senha-erro"></p>
+          <button class="btn" id="btn-senha-confirmar" style="margin-top:12px;">Responder</button>
+        </div>
+        <div class="envelope-body"></div>
+        <div class="envelope-flap"></div>
+        <div class="envelope-seal" id="selo">✦</div>
+        <div class="seal-shards" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -857,6 +1228,17 @@ if (emailjsAtivo && window.emailjs) {
 
 
 /* =========================================================
+   CAMINHOS DAS IMAGENS
+   Resolve os arquivos sempre a partir da pasta do index.html.
+   Isso evita problemas no GitHub Pages com caminhos relativos.
+   ========================================================= */
+const ASSET_BASE = new URL("./", document.baseURI).href;
+function asset(nome){
+  if (!nome) return "";
+  return new URL(nome.replace(/^\.\//, ""), ASSET_BASE).href;
+}
+
+/* =========================================================
    DADOS — troque os caminhos das imagens pelas suas
    ========================================================= */
 const COMIDAS = [
@@ -938,14 +1320,61 @@ const FLORES = [
   },
 ];
 
-const state = { beijo: null, flor: null, cor: null, comida: [] };
+const state = { beijo: null, flor: null, cor: null, comida: [], comidaDestino: null };
+
+/* modo noite real: depois das 18h no relógio dela */
+(function applyNightMode(){
+  const hora = new Date().getHours();
+  if (hora >= 18 || hora < 6){
+    document.body.classList.add("night");
+  }
+})();
 
 /* =========================================================
    NAVEGAÇÃO
    ========================================================= */
+/* perguntas com transição de conto de fadas */
+const TALE_SCREENS = new Set(["comida", "flor", "cor", "beijo"]);
+
 function goTo(name){
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById("screen-" + name).classList.add("active");
+  const stage = document.querySelector(".stage");
+  const veil = document.getElementById("fairy-veil");
+  const current = document.querySelector(".screen.active");
+  const currentName = current ? current.id.replace("screen-", "") : null;
+  const soft =
+    currentName &&
+    ((TALE_SCREENS.has(currentName) && TALE_SCREENS.has(name)) ||
+     (currentName === "comida" && name === "flor") ||
+     (currentName === "flor" && name === "cor") ||
+     (currentName === "cor" && name === "beijo"));
+
+  function show(){
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById("screen-" + name).classList.add("active");
+  }
+
+  if (!soft || !stage){
+    show();
+    return;
+  }
+
+  stage.classList.remove("tale-in");
+  stage.classList.add("tale-out");
+  if (veil){
+    veil.classList.remove("active");
+    void veil.offsetWidth;
+    veil.classList.add("active");
+  }
+
+  setTimeout(() => {
+    show();
+    stage.classList.remove("tale-out");
+    stage.classList.add("tale-in");
+    setTimeout(() => {
+      stage.classList.remove("tale-in");
+      if (veil) veil.classList.remove("active");
+    }, 700);
+  }, 480);
 }
 
 /* =========================================================
@@ -967,7 +1396,7 @@ const swipeState = {
 };
 
 function renderComida(){
-  swipeState.deck = COMIDAS.map(c => ({ id: c.id, label: c.label, img: RESTAURANTES[c.id] }));
+  swipeState.deck = COMIDAS.map(c => ({ id: c.id, label: c.label, img: asset(RESTAURANTES[c.id]) }));
   swipeState.liked = [];
   swipeState.total = swipeState.deck.length;
   drawSwipeStack();
@@ -1006,7 +1435,7 @@ function drawSwipeStack(){
     const item = visiveis[i];
     const card = document.createElement("div");
     card.className = "swipe-card" + (i === 0 ? " top" : " behind");
-    card.style.backgroundImage = `url(${item.img})`;
+    card.style.backgroundImage = `url("${item.img}")`;
     card.style.zIndex = String(10 - i);
     if (i > 0){
       card.style.transform = `translateY(${i * 8}px) scale(${1 - i * 0.04})`;
@@ -1104,9 +1533,10 @@ document.getElementById("btn-swipe-nope").addEventListener("click", () => {
 });
 
 function finishSwipe(){
-  /* usa a ordem dos "sim"; se ela não curtiu nenhum, cai pro primeiro
-     da lista original só pra sempre existir um restaurante no final */
-  state.comida = swipeState.liked.length > 0 ? swipeState.liked : [COMIDAS[0].id];
+  /* comidas curtidas (sem ordem de preferência); uma é sorteada pro jantar */
+  const liked = swipeState.liked.length > 0 ? [...swipeState.liked] : [COMIDAS[0].id];
+  state.comida = liked;
+  state.comidaDestino = liked[Math.floor(Math.random() * liked.length)];
   setTimeout(() => goTo("flor"), 500);
 }
 
@@ -1114,7 +1544,7 @@ function renderCards(containerId, items, field, onSelect){
   const el = document.getElementById(containerId);
   el.innerHTML = items.map(item => `
     <button class="card" data-id="${item.id}" role="button" tabindex="0">
-      <img src="${item.thumb || item.img}" alt="${item.label}" loading="lazy">
+      <img src="${asset(item.thumb || item.img)}" alt="${item.label}" loading="lazy" onerror="this.style.display='none'">
       <div class="label">${item.label}</div>
     </button>
   `).join("");
@@ -1259,17 +1689,56 @@ function hexToRgb(hex){
 /* =========================================================
    ORÁCULO / REVELAÇÃO
    ========================================================= */
+function typeWriter(el, fullText, speed){
+  return new Promise((resolve) => {
+    el.textContent = "";
+    el.classList.add("typing");
+    let i = 0;
+    function tick(){
+      if (i <= fullText.length){
+        el.textContent = fullText.slice(0, i);
+        i++;
+        setTimeout(tick, speed);
+      } else {
+        el.classList.remove("typing");
+        resolve();
+      }
+    }
+    tick();
+  });
+}
+
+const ORACLE_PHRASES = [
+  "Consultando as estrelas…",
+  "Lendo as cartas…",
+  "Alinhando o destino…",
+  "Quase lá…"
+];
+
 async function runOracle(){
   goTo("oracle");
 
   const flash = document.getElementById("oracle-flash");
   flash.classList.remove("growing");
-  void flash.offsetWidth; /* força reflow pra reiniciar a transição */
+  void flash.offsetWidth;
   requestAnimationFrame(() => flash.classList.add("growing"));
+
+  const oracleP = document.querySelector(".oracle p");
+  let phraseIdx = 0;
+  if (oracleP){
+    oracleP.textContent = ORACLE_PHRASES[0];
+    const phraseTimer = setInterval(() => {
+      phraseIdx = (phraseIdx + 1) % ORACLE_PHRASES.length;
+      oracleP.textContent = ORACLE_PHRASES[phraseIdx];
+    }, 850);
+    /* guarda pra limpar depois */
+    runOracle._phraseTimer = phraseTimer;
+  }
 
   await salvarResposta(state);
 
   setTimeout(() => {
+    if (runOracle._phraseTimer) clearInterval(runOracle._phraseTimer);
     montarRevelacao();
     goTo("reveal");
     flash.classList.remove("growing");
@@ -1316,7 +1785,7 @@ function montarRevelacao(){
   for(let slot=0;slot<4;slot++){
     const d=document.createElement("div");
     d.className="piece";
-    d.style.backgroundImage=`url(${img})`;
+    d.style.backgroundImage=`url("${asset(img)}")`;
     d.style.animationDelay=(slot*0.05)+"s";
     d.addEventListener("click", () => {
       if (puzzle.classList.contains("solved")) return;
@@ -1340,17 +1809,40 @@ function montarRevelacao(){
   }
   render();
 
-  document.getElementById("cap-date").textContent=
-  `Chegando pro nosso date, com ${flor.label.toLowerCase()} ${corInfo.label.toLowerCase()} debaixo do braço.`;
-
-  /* comida favorita = primeira escolhida no ranking */
-  const comidaTopId = state.comida[0];
+  /* destino do jantar = uma das comidas curtidas (sorteada, não por ordem) */
+  const comidaTopId = state.comidaDestino || (state.comida && state.comida[0]);
   const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
   const restauranteImg = RESTAURANTES[comidaTopId];
 
-  document.getElementById("restaurant-img").src = restauranteImg;
-  document.getElementById("cap-restaurant").textContent =
-  `E pra fechar a noite, um jantar ${comidaTop.label.toLowerCase()}.`;
+  document.getElementById("restaurant-img").src = asset(restauranteImg);
+
+  /* chips das comidas escolhidas — sem ranking/ordem */
+  const rankCard = document.getElementById("ranking-card");
+  const rankList = document.getElementById("ranking-list");
+  const likes = (state.comida || []).map(id => COMIDAS.find(c => c.id === id)).filter(Boolean);
+  if (likes.length > 0){
+    rankCard.hidden = false;
+    rankList.innerHTML = likes.map((c, i) => `
+      <li style="animation-delay:${0.12 + i * 0.1}s">${c.label}</li>
+    `).join("");
+  } else {
+    rankCard.hidden = true;
+    rankList.innerHTML = "";
+  }
+
+  /* oráculo ao vivo: textos digitados letra a letra */
+  const txtFlor = `Chegando pro nosso date, com ${flor.label.toLowerCase()} ${corInfo.label.toLowerCase()} debaixo do braço.`;
+  const txtRest = `E pra fechar a noite, um jantar ${comidaTop ? comidaTop.label.toLowerCase() : ""}.`;
+  const capDate = document.getElementById("cap-date");
+  const capRest = document.getElementById("cap-restaurant");
+  capDate.textContent = "";
+  capRest.textContent = "";
+
+  (async () => {
+    await typeWriter(capDate, txtFlor, 28);
+    await new Promise(r => setTimeout(r, 280));
+    await typeWriter(capRest, txtRest, 28);
+  })();
 }
 
 
@@ -1374,11 +1866,6 @@ function playChime(){
     });
   } catch(e){ /* Web Audio não suportado */ }
 }
-
-document.getElementById("btn-confirm").addEventListener("click", () => {
-  playChime();
-  document.getElementById("modal-insta").classList.add("active");
-});
 
 document.getElementById("modal-close").addEventListener("click", () => {
   document.getElementById("modal-insta").classList.remove("active");
@@ -1497,39 +1984,96 @@ function launchConfetti(){
 /* =========================================================
    SENHA + TELA ROSA (convite pro jantar)
    ========================================================= */
-const SENHA_CORRETA = "beijonosso";
+const RESPOSTA_CORRETA = "carbonara";
+const MENSAGENS_ERRO = [
+  "hmm… não é esse prato. tenta de novo.",
+  "quase! dica: é uma massa italiana…",
+  "terceira tentativa! provavelmente já comeu isso, hein…",
+  "ainda não! queijo e bacon.",
+  "última dica: carbona… algo. 😉",
+  "tá difícil? chama o anfitrião no insta (@joaopedroo.fm)."
+];
+
 const jantarState = { restauranteId: null, restauranteImg: null, restauranteLabel: null, data: null, email: null };
 
 const modalSenha = document.getElementById("modal-senha");
 const inputSenha = document.getElementById("input-senha");
 const senhaErro = document.getElementById("senha-erro");
+const senhaBox = document.getElementById("senha-box");
+let tentativas = 0;
+
+
+
+const envelopeEl = document.getElementById("envelope");
+const envelopeWrap = document.getElementById("envelope-wrap");
 
 document.getElementById("btn-open-senha").addEventListener("click", () => {
   senhaErro.classList.remove("show");
   inputSenha.value = "";
+  envelopeEl.classList.remove("open", "seal-breaking");
+  envelopeWrap.classList.remove("shake");
   modalSenha.classList.add("active");
-  setTimeout(() => inputSenha.focus(), 50);
+  setTimeout(() => {
+    envelopeEl.classList.add("open");
+    setTimeout(() => inputSenha.focus(), 450);
+  }, 180);
 });
 
 document.getElementById("modal-senha-close").addEventListener("click", () => {
+  envelopeEl.classList.remove("open");
   modalSenha.classList.remove("active");
 });
 
 modalSenha.addEventListener("click", (e) => {
-  if (e.target.id === "modal-senha") modalSenha.classList.remove("active");
+  if (e.target.id === "modal-senha") {
+    envelopeEl.classList.remove("open");
+    modalSenha.classList.remove("active");
+  }
 });
 
+document.getElementById("btn-senha-confirmar").addEventListener("click", tentarSenha);
+
+inputSenha.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") tentarSenha();
+});
+
+
+function normalizar(txt){
+  return (txt || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 function tentarSenha(){
-  const valor = (inputSenha.value || "").trim().toLowerCase();
-  if (valor === SENHA_CORRETA){
-    modalSenha.classList.remove("active");
-    abrirTelaJantar();
+  const valor = normalizar(inputSenha.value);
+  if (valor === RESPOSTA_CORRETA){
+    /* 1) selo de cera quebra  2) envelope fecha  3) tela do jantar */
+    envelopeEl.classList.add("seal-breaking");
+    playChime();
+    if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+
+    setTimeout(() => {
+      envelopeEl.classList.remove("open");
+    }, 550);
+
+    setTimeout(() => {
+      envelopeEl.classList.remove("seal-breaking");
+      modalSenha.classList.remove("active");
+      abrirTelaJantar();
+    }, 1200);
   } else {
+    tentativas++;
+    envelopeWrap.classList.remove("shake");
+    void envelopeWrap.offsetWidth;
+    envelopeWrap.classList.add("shake");
+    senhaErro.textContent = MENSAGENS_ERRO[Math.min(tentativas - 1, MENSAGENS_ERRO.length - 1)];
     senhaErro.classList.add("show");
+    if (navigator.vibrate) navigator.vibrate(80);
   }
 }
-document.getElementById("btn-senha-confirmar").addEventListener("click", tentarSenha);
-inputSenha.addEventListener("keydown", (e) => { if (e.key === "Enter") tentarSenha(); });
+
 
 function pinkGoTo(stepId){
   document.querySelectorAll(".pink-step").forEach(s => s.classList.remove("active"));
@@ -1537,13 +2081,82 @@ function pinkGoTo(stepId){
 }
 
 function abrirTelaJantar(){
+  naoAttempts = 0;
+  btnSim.style.cssText = "";
+  btnSim.textContent = "Sim";
+  btnNao.style.opacity = "";
+  btnNao.style.pointerEvents = "";
   pinkGoTo("pink-pergunta");
   document.getElementById("tela-jantar").classList.add("active");
 }
 
-document.getElementById("btn-jantar-sim").addEventListener("click", () => {
-  /* vincula com o restaurante escolhido lá atrás, no swipe de comidas */
-  const comidaTopId = state.comida[0];
+/* botão "Não" foge, e o "Sim" cresce a cada tentativa */
+const btnNao = document.getElementById("btn-jantar-nao");
+const btnSim = document.getElementById("btn-jantar-sim");
+let naoAttempts = 0;
+let ultimoNao = 0;
+
+attachDodge(btnNao);
+
+function crescerSim(){
+  /* evita contar 2x no mesmo toque (touchstart + click) */
+  const agora = Date.now();
+  if (agora - ultimoNao < 450) return;
+  ultimoNao = agora;
+
+  naoAttempts++;
+
+  if (naoAttempts < 5){
+    /* fase 1: cresce retangular, sem emoji */
+    const scale = Math.min(1 + naoAttempts * 0.3, 2.2);
+    btnSim.style.transform = `scale(${scale})`;
+    btnSim.style.boxShadow = `0 ${8 + naoAttempts * 4}px ${24 + naoAttempts * 8}px rgba(201,163,99,${0.25 + naoAttempts * 0.08})`;
+    btnSim.style.position = "relative";
+    btnSim.style.zIndex = "1";
+    btnSim.style.borderRadius = "2px";
+
+  } else {
+    /* fase 2: cresce retangular até cobrir a tela, depois avança */
+    btnNao.style.opacity = "0";
+    btnNao.style.pointerEvents = "none";
+    btnSim.style.pointerEvents = "none";
+
+    const rect = btnSim.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    btnSim.style.transition = "none";
+    btnSim.style.position = "fixed";
+    btnSim.style.left = cx + "px";
+    btnSim.style.top = cy + "px";
+    btnSim.style.width = rect.width + "px";
+    btnSim.style.height = rect.height + "px";
+    btnSim.style.margin = "0";
+    btnSim.style.transform = "translate(-50%, -50%) scale(1)";
+    btnSim.style.transformOrigin = "center center";
+    btnSim.style.zIndex = "100";
+    btnSim.style.borderRadius = "2px";
+
+    void btnSim.offsetWidth;
+
+    btnSim.style.transition = "transform 2s cubic-bezier(.6,.05,.3,1)";
+    const scaleX = (window.innerWidth / rect.width) * 1.15;
+    const scaleY = (window.innerHeight / rect.height) * 1.15;
+    const scale = Math.max(scaleX, scaleY);
+    btnSim.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+    if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+    playChime();
+
+    setTimeout(() => {
+      irProRestaurante();
+    }, 2100);
+  }
+}
+
+/* prepara a tela do restaurante e avança */
+function irProRestaurante(){
+  const comidaTopId = state.comidaDestino || (state.comida && state.comida[0]);
   const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
   const restauranteImg = comidaTopId ? RESTAURANTES[comidaTopId] : null;
 
@@ -1554,20 +2167,38 @@ document.getElementById("btn-jantar-sim").addEventListener("click", () => {
   const imgEl = document.getElementById("jantar-restaurant-img");
   const capEl = document.getElementById("jantar-restaurant-cap");
   if (restauranteImg){
-    imgEl.src = restauranteImg;
+    imgEl.src = asset(restauranteImg);
     imgEl.style.display = "block";
     capEl.textContent = `Nosso jantar vai ser ${comidaTop.label.toLowerCase()}, do jeito que você escolheu.`;
   } else {
     imgEl.style.display = "none";
-    capEl.textContent = "Ainda falta você escolher a comida lá em cima pra eu saber o restaurante certo.";
+    capEl.textContent = "Ainda falta você escolher a comida pra eu saber o restaurante certo.";
   }
 
-  playChime();
+  /* esconde e reseta o botão (evita flash no canto) */
+  btnSim.style.transition = "none";
+  btnSim.style.opacity = "0";
+  btnSim.style.pointerEvents = "none";
+  void btnSim.offsetWidth;
+  btnSim.style.cssText = "";
+  btnSim.textContent = "Sim";
+  btnNao.style.opacity = "";
+  btnNao.style.pointerEvents = "";
+  naoAttempts = 0;
+
   pinkGoTo("pink-restaurante");
+}
+
+/* clique direto no "Sim" (sem brincar com o "Não") */
+btnSim.addEventListener("click", () => {
+  if (naoAttempts >= 5) return; /* já está crescendo, ignora cliques extras */
+  irProRestaurante();
 });
 
-/* botão "Não" foge do cursor/toque, igual ao "Em lugar nenhum" */
-attachDodge(document.getElementById("btn-jantar-nao"));
+btnNao.addEventListener("mouseenter", crescerSim);
+btnNao.addEventListener("touchstart", crescerSim);
+btnNao.addEventListener("click", crescerSim);
+
 
 document.getElementById("btn-ir-calendario").addEventListener("click", () => {
   pinkGoTo("pink-calendario");
