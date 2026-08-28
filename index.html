@@ -562,6 +562,60 @@
     50%{ opacity:0; }
   }
 
+
+  .food-choice{
+    width:min(520px,100%);
+    margin:22px auto 0;
+    padding:20px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,0.22);
+    border-radius:4px;
+    text-align:center;
+    animation:fadeIn .45s ease both;
+  }
+  .food-choice-title{
+    font-family:'Cinzel',serif;
+    font-size:15px;
+    color:var(--gold-soft);
+    margin:0 0 7px;
+  }
+  .food-choice-hint{
+    font-style:italic;
+    font-size:14px;
+    color:rgba(243,236,221,.68);
+    margin:0 0 16px;
+  }
+  .food-choice-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .food-choice-btn{
+    appearance:none;
+    border:1px solid var(--line);
+    background:rgba(243,236,221,.04);
+    color:var(--cream);
+    padding:13px 10px;
+    border-radius:3px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:14px;
+    transition:transform .2s ease, background .2s ease, border-color .2s ease;
+  }
+  .food-choice-btn:hover{
+    transform:translateY(-2px);
+    background:rgba(201,163,99,.12);
+    border-color:var(--gold);
+  }
+  .food-choice-btn.selected{
+    background:rgba(201,163,99,.18);
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px rgba(201,163,99,.18);
+  }
+  @media (max-width:480px){
+    .food-choice-grid{grid-template-columns:1fr;}
+  }
+
   .ranking-card{
     border:1px solid var(--line);
     background:rgba(0,0,0,0.2);
@@ -1533,11 +1587,59 @@ document.getElementById("btn-swipe-nope").addEventListener("click", () => {
 });
 
 function finishSwipe(){
-  /* comidas curtidas (sem ordem de preferência); uma é sorteada pro jantar */
-  const liked = swipeState.liked.length > 0 ? [...swipeState.liked] : [COMIDAS[0].id];
+  /*
+     Depois dos swipes, ela escolhe explicitamente o que quer que você leve.
+     Nada é sorteado: a escolha dela vira o destino do jantar.
+  */
+  const liked = swipeState.liked.length > 0 ? [...swipeState.liked] : [];
   state.comida = liked;
-  state.comidaDestino = liked[Math.floor(Math.random() * liked.length)];
-  setTimeout(() => goTo("flor"), 500);
+  state.comidaDestino = null;
+
+  const screen = document.getElementById("screen-comida");
+  const oldChoice = document.getElementById("food-choice");
+  if (oldChoice) oldChoice.remove();
+
+  const options = liked.length > 0 ? liked : COMIDAS.map(c => c.id);
+  const titulo = liked.length > 0
+    ? "Agora você escolhe"
+    : "Escolhe uma pra mim";
+  const hint = liked.length > 0
+    ? "Qual dessas você quer que eu leve para o nosso jantar?"
+    : "Você não curtiu nenhuma, então escolhe livremente uma das opções.";
+
+  const choice = document.createElement("div");
+  choice.id = "food-choice";
+  choice.className = "food-choice";
+  choice.innerHTML = `
+    <p class="food-choice-title">${titulo}</p>
+    <p class="food-choice-hint">${hint}</p>
+    <div class="food-choice-grid">
+      ${options.map(id => {
+        const comida = COMIDAS.find(c => c.id === id);
+        return `<button type="button" class="food-choice-btn" data-food="${id}">${comida.label}</button>`;
+      }).join("")}
+    </div>
+  `;
+
+  screen.appendChild(choice);
+
+  document.getElementById("swipe-stack").style.display = "none";
+  document.querySelector(".swipe-actions").style.display = "none";
+  document.getElementById("swipe-counter").style.display = "none";
+
+  choice.querySelectorAll(".food-choice-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const selectedId = btn.dataset.food;
+      state.comidaDestino = selectedId;
+      state.comida = [selectedId];
+
+      choice.querySelectorAll(".food-choice-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+
+      if (navigator.vibrate) navigator.vibrate(20);
+      setTimeout(() => goTo("flor"), 450);
+    });
+  });
 }
 
 function renderCards(containerId, items, field, onSelect){
@@ -1809,8 +1911,8 @@ function montarRevelacao(){
   }
   render();
 
-  /* destino do jantar = uma das comidas curtidas (sorteada, não por ordem) */
-  const comidaTopId = state.comidaDestino || (state.comida && state.comida[0]);
+  /* destino do jantar = exatamente a comida escolhida por ela */
+  const comidaTopId = state.comidaDestino || (state.comida && state.comida[0]) || null;
   const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
   const restauranteImg = RESTAURANTES[comidaTopId];
 
@@ -2156,7 +2258,7 @@ function crescerSim(){
 
 /* prepara a tela do restaurante e avança */
 function irProRestaurante(){
-  const comidaTopId = state.comidaDestino || (state.comida && state.comida[0]);
+  const comidaTopId = state.comidaDestino || (state.comida && state.comida[0]) || null;
   const comidaTop = COMIDAS.find(c => c.id === comidaTopId);
   const restauranteImg = comidaTopId ? RESTAURANTES[comidaTopId] : null;
 
